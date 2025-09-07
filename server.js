@@ -1,13 +1,14 @@
 const express = require('express')
+// const { ExpressPeerServer } = require("peer");
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
-const { v4: uuidv4 } = require('uuid')
+const { ulid } = require('ulid')
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.get('/', (req, res) => {
-    res.redirect(`/${uuidv4()}`)
+    res.redirect(`/${ulid()}`)
 })
 app.get('/:room', (req, res) => {
     res.render('room', { roomId: req.params.room })
