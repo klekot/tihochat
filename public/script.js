@@ -1,7 +1,7 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer(undefined, {
-    host: '127.0.0.1',
+    host: 'tihochat.ru',
     port: '30001',
     path: '/'
     // config: {
