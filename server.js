@@ -7,10 +7,10 @@ const express = require('express');
 const app = express();
 // const httpServer = http.createServer(app);
 const httpsServer = https.createServer({
-    // key: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.key"),
-    // cert: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.crt")
-    key: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2-key.pem"),
-    cert: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2.pem")
+    key: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.key"),
+    cert: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.crt")
+    // key: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2-key.pem"),
+    // cert: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2.pem")
 }, app);
 const io = new Server(httpsServer, {
     cors: {
