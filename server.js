@@ -1,14 +1,18 @@
 const { readFileSync } = require("fs");
-const { createServer } = require("https");
+// var http = require('http');
+var https = require("https");
 const { Server } = require("socket.io");
 
 const express = require('express');
 const app = express();
-const server = createServer({
-    key: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.key"),
-    cert: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.crt")
-});
-const io = new Server(server, {
+// const httpServer = http.createServer(app);
+const httpsServer = https.createServer({
+    // key: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.key"),
+    // cert: readFileSync("/etc/ssl/tihochat.ru/tihochat.ru.crt")
+    key: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2-key.pem"),
+    cert: readFileSync("/Volumes/HIKVISION/Sites/tihochat/localhost+2.pem")
+}, app);
+const io = new Server(httpsServer, {
     cors: {
         origin: '*'
     }
@@ -35,4 +39,5 @@ io.on("connection", (socket) => {
         });
     });
 });
-server.listen(process.env.PORT || 30000);
+// httpServer.listen(process.env.PORT || 30003);
+httpsServer.listen(process.env.PORT || 30000);
