@@ -60,7 +60,7 @@ video {
 }
 
 .options {
-  padding: 1rem;
+  padding: 1rem 1rem 50px;
   display: flex;
   background-color: var(--main-darklg);
 }
@@ -107,7 +107,7 @@ video {
 }
 
 .main__message_container {
-  padding: 1rem;
+  padding: 1rem 1rem 50px;
   display: flex;
   align-items: center;
   justify-content: center;
