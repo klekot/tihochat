@@ -171,18 +171,99 @@ video {
   color: #fff;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 320px) {
   .main__right {
-    display: none;
+    width: 50%;
+    flex: 1;
   }
   .main__left {
-    width: 100%;
+    width: 50%;
     flex: 1;
   }
 
   video {
     height: auto;
-    width: 100%;
+    width: 50%;
+  }
+
+  #showChat {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .main__right {
+    width: 50%;
+    flex: 1;
+  }
+  .main__left {
+    width: 50%;
+    flex: 1;
+  }
+
+  video {
+    height: auto;
+    width: 50%;
+  }
+
+  #showChat {
+    display: flex;
+  }
+}
+
+@media (max-width: 767px) {
+  .main__right {
+    width: 50%;
+    flex: 1;
+  }
+  .main__left {
+    width: 50%;
+    flex: 1;
+  }
+
+  video {
+    height: auto;
+    width: 50%;
+  }
+
+  #showChat {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+  .main__right {
+    width: 50%;
+    flex: 1;
+  }
+  .main__left {
+    width: 50%;
+    flex: 1;
+  }
+
+  video {
+    height: auto;
+    width: 50%;
+  }
+
+  #showChat {
+    display: flex;
+  }
+}
+
+@media (min-width: 1200px) {
+  .main__right {
+    width: 50%;
+    flex: 1;
+  }
+  .main__left {
+    width: 50%;
+    flex: 1;
+  }
+
+  video {
+    height: auto;
+    width: 50%;
   }
 
   #showChat {
