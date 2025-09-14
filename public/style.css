@@ -172,11 +172,17 @@ video {
 }
 
 @media (max-width: 700px) {
+  body {
+    overflow: hidden;
+  }
+
   .main__right {
     display: none;
   }
   .main__left {
     width: 100%;
+    height: auto;
+    overflow: auto;
     flex: 1;
   }
 
