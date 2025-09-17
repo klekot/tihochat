@@ -23,7 +23,22 @@
   background-color: var(--main-darklg);
 }
 
-.logo > h1 {
+.logo > h1, h2, h3, h4, h5, h6 {
+  color: var(--main-light);
+}
+
+p.center {
+  text-align: center;
+  color: var(--main-light);
+}
+
+p#error__message {
+  color: red;
+  font-weight: bold;
+}
+
+span.show__password {
+  margin-top: 10px;
   color: var(--main-light);
 }
 
@@ -31,6 +46,17 @@
   overflow: hidden;
   height: 92vh;
   display: flex;
+}
+
+.main__common {
+  width: 100%;
+  height: 100%;
+  background-color: var(--main-darklg);
+}
+
+.form__container {
+  margin: auto;
+  width: 35%;
 }
 
 .main__left {

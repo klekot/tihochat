@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tiho Chat</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <script src="/js/bootstrap.js"></script>
+    <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <div class="header__back">
+            <i class="fas fa-angle-left"></i>
+        </div>
+        <h1>Tiho Chat</h1>
+    </div>
+</div>
+<div class="main">
+    <div class="main__common">
+        <div class="form__container">
+            <p class="center" id="error__message">
+                <script>
+                    const success = "<%= success %>";
+                    const p = document.getElementById("error__message");
+                    if (success === "0") {
+                        p.innerHTML = 'Введены неверные данные. Повторите попытку';
+                    }
+                </script>
+            </p>
+            <main class="form-signin w-100 m-auto">
+                <form action="/invite" method="post">
+                    <div class="mb-3">
+                        <input
+                            class="form-control form-control-lg"
+                            type="text"
+                            id="invite"
+                            name="invite"
+                            placeholder="Введите Ваш код приглашения"
+                            aria-label=".form-control-lg example"
+                        >
+                    </div>
+                    <div class="d-grid gap-2 col-12 mx-auto">
+                        <button class="btn btn-outline-light btn-lg" type="submit">Войти на сайт</button>
+                    </div>
+                    <p class="mt-5 mb-3 center">
+                        Запросить код приглашения: <a href="mailto:klekotnev@gmail.com">jerryclaycat@gmail.com</a>
+                    </p>
+                </form>
+            </main>
+        </div>
+    </div>
+</div>
+</body>
+</html>

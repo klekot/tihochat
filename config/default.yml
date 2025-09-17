@@ -1,0 +1,11 @@
+ssl:
+  key: "localhost-key.pem"
+  cert: "localhost.pem"
+session:
+  secret: ""
+db:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: ""
+  database: "tihochat"

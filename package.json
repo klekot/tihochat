@@ -10,11 +10,17 @@
   "author": "Igor Klekotnev",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^2.2.0",
+    "bootstrap": "^5.3.8",
+    "config": "^4.1.1",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "jquery": "^3.7.1",
+    "js-yaml": "^4.1.0",
+    "mysql": "^2.18.1",
     "peer": "^0.5.3",
     "socket.io": "^4.8.1",
     "ulid": "^3.0.1"
