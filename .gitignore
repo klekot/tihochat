@@ -1,5 +1,6 @@
 .idea
 node_modules
 /config/local.yml
+/config/tihochat.ru.yml
 localhost+2-key.pem
 localhost+2.pem
