@@ -1,0 +1,21 @@
+Version 1.1.0
+ -  update .gitignore
+ - Update .gitignore
+ - add authorization by invites
+ - pull buttons up for android devices
+ - css for mobile again
+ - return css
+ - little fix for mobile devices
+ - add robots disallow all and remove not used file
+ - change ssl keys to prod
+ - some fix for https
+ - rem socket const from script.js
+ - add var socket to client side
+ - Add https for socket.io
+ - change server name to prod for peerjs
+ - Beautiful view, text chat, names, audio and video buttons
+ - some fixes
+ - uuid to ulid and corr requirements
+ - start develop
+ - first commit
+
