@@ -4,3 +4,4 @@ node_modules
 /config/tihochat.ru.yml
 localhost+2-key.pem
 localhost+2.pem
+/bumpversion.sh
