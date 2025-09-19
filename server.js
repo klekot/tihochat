@@ -1,4 +1,3 @@
-let inviteGlobal, inviteIdGlobal, personGlobal, userGlobal, nameGlobal, loginGlobal = ``;
 let https = require("https");
 
 const config = require("config");
@@ -45,7 +44,12 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 app.get('/room/:room', (req, res) => {
-    res.render('room', { roomId: req.params.room, currentUser: nameGlobal })
+    // Check if user is logged in
+    if (!req.session.user) {
+        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
+    }
+
+    res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
 });
 
 // Invite checking out
@@ -55,42 +59,23 @@ app.get('/invite', (req, res) => {
 });
 app.post('/invite', (req, res) => {
     const { invite } = req.body;
-    inviteGlobal = invite;
-    let inviteValid = false;
-    let person = 'Invited person';
+    // inviteGlobal = invite;
     con.connect(async function(err) {
-        if (err) {
-            console.log(err.message);
-        }
         let sql = `SELECT * FROM invites WHERE invite_key='${invite}'`;
-        console.log(sql);
         con.query(sql, function (err, result, fields) {
-            if (err) {
-                console.log(err.message);
-            }
-            console.log(result);
             if (result && result.length) {
                 let json =  JSON.parse(JSON.stringify(result));
-                inviteValid = json[0].invite_key == invite;
-                personGlobal = person = json[0].person;
-                inviteIdGlobal = json[0].invite_id;
-                if (inviteValid) {
+                let person = json[0].person;
+                let inviteId = json[0].invite_id;
+                if (json[0].invite_key === invite) {
                     if (json[0].user_id) { // already linked to user
                         sql = `SELECT * FROM users WHERE user_id='${json[0].user_id}'`;
-                        console.log(sql);
                         con.query(sql, function (err, result, fields) {
-                            if (err) {
-                                console.log(err.message);
-                            }
-                            console.log(result);
                             let json = JSON.parse(JSON.stringify(result));
-                            nameGlobal = json[0].name;
-                            loginGlobal = json[0].login;
+                            res.redirect(`/login?success=1&user_name=${json[0].name}&user_login=${json[0].login}`);
                         });
-
-                        res.redirect(`/login`);
                     } else {
-                        res.redirect(`/registration`);
+                        res.redirect(`/registration?person=${person}&invite_id=${inviteId}`);
                     }
                 } else {
                     res.redirect(`/invite?success=0`);
@@ -104,7 +89,8 @@ app.post('/invite', (req, res) => {
 
 // Registration route
 app.get('/registration', (req, res) => {
-    res.render('registration', {person: personGlobal, inviteId: inviteIdGlobal});
+    let {query} = req;
+    res.render('registration', {person: query.person, invite_id: query.invite_id});
 });
 app.post('/registration', (req, res) => {
     const { invite_id, name, login, password } = req.body;
@@ -113,37 +99,28 @@ app.post('/registration', (req, res) => {
     con.connect(async function(err) {
         // checking out is invite exists
         let sql = `SELECT * FROM invites WHERE invite_id='${invite_id}'`;
-        console.log(sql);
         con.query(sql, function (err, result, fields) {
             if (result && result.length) {
                 let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
-                console.log(sql);
-                con.query(sql, function (err, result, fields) {});
-
-                sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
-                console.log(sql);
                 con.query(sql, function (err, result, fields) {
-                    if (err) {
-                        console.log(err.message);
-                    }
-                    console.log(result);
-                    if (result && result.length) {
-                        userGlobal = JSON.parse(JSON.stringify(result));
-                        nameGlobal = userGlobal.name;
-
-                        sql = `UPDATE invites SET user_id=${userGlobal.user_id} WHERE invite_id=${invite_id}`;
-                        con.query(sql, function (err, result, fields) { if (err) console.log(err.message); });
-
-                        // Store user information in session (excluding password)
-                        req.session.user = {
-                            id: userGlobal.user_id,
-                            login: userGlobal.login
-                        };
-
-                        res.redirect(`/room/${ulid()}`);
-                    } else {
-                        res.status(500).render('error_pages/500.ejs');
-                    }
+                    let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
+                    con.query(sql, function (err, result, fields) {
+                        if (result && result.length) {
+                            let json = JSON.parse(JSON.stringify(result));
+                            let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_id=${invite_id} `;
+                            con.query(sql, function (err, result, fields) {
+                                // Store user information in session (excluding password)
+                                req.session.user = {
+                                    id: json[0].user_id,
+                                    login: json[0].login,
+                                    name: json[0].name
+                                };
+                                res.redirect(`/room/${ulid()}`);
+                            });
+                        } else {
+                            res.status(500).render('error_pages/500.ejs');
+                        }
+                    });
                 });
             } else {
                 res.redirect(`/invite?success=0`);
@@ -155,32 +132,23 @@ app.post('/registration', (req, res) => {
 // Login route
 app.get('/login', (req, res) => {
     let {query} = req;
-    res.render('login', {success: query.success, name: nameGlobal, login: loginGlobal});
+    res.render('login', {success: query.success, user_name: query.user_name, user_login: query.user_login});
 });
 app.post('/login', (req, res) => {
     const { login, password } = req.body;
     // Find user
     con.connect(async function(err) {
-        if (err) {
-            console.log(err.message);
-        }
         let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
         console.log(sql);
         con.query(sql, function (err, result, fields) {
-            if (err) {
-                console.log(err.message);
-            }
-            console.log(result);
             if (result && result.length === 1) {
-                userGlobal = JSON.parse(JSON.stringify(result));
-                nameGlobal = userGlobal.name;
-
+                let json = JSON.parse(JSON.stringify(result));
                 // Store user information in session (excluding password)
                 req.session.user = {
-                    id: userGlobal.user_id,
-                    login: userGlobal.login
+                    id: json[0].user_id,
+                    login: json[0].login,
+                    name: json[0].name
                 };
-
                 res.redirect(`/room/${ulid()}`);
             } else {
                 res.redirect(`/login?success=0`);
@@ -193,20 +161,28 @@ app.post('/login', (req, res) => {
 app.get('/profile', (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
     }
 
-    res.json({ message: 'Profile accessed', user: req.session.user });
+    res.render('profile', { sessionUser: req.session.user });
 });
 
 // Logout route
+app.get('/logout', (req, res) => {
+    // Check if user is logged in
+    if (!req.session.user) {
+        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
+    }
+
+    res.render('logout', { sessionUser: req.session.user });
+});
 app.post('/logout', (req, res) => {
     // Destroy session
     req.session.destroy((err) => {
         if (err) {
-            return res.status(500).json({ message: 'Logout failed' });
+            res.status(500).render('error_pages/500.ejs', { message: 'Logout failed' });
         }
-        res.json({ message: 'Logout successful' });
+        res.redirect(`/`);
     });
 });
 ///////////END OF ROUTES/////////////
@@ -216,7 +192,7 @@ io.on("connection", (socket) => {
         socket.join(roomId);
         setTimeout(()=>{
             socket.to(roomId).emit("user-connected", userId);
-        }, 1000)
+        }, 1000);
         socket.on("message", (message) => {
             io.to(roomId).emit("createMessage", message, userName);
         });

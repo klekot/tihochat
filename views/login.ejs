@@ -7,9 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Tiho Chat</title>
     <link rel="stylesheet" href="/style.css" />
-    <script>
-        const PERSON = "<%= name %>";
-    </script>
     <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <script src="/js/bootstrap.js"></script>
@@ -27,6 +24,9 @@
 <div class="main">
     <div class="main__common">
         <div class="form__container">
+            <div class="hello">
+                <h3><%= user_name ? 'Здравствуйте, ' + user_name + '!' : '' %></h3>
+            </div>
             <p class="center" id="error__message">
                 <script>
                     const success = "<%= success %>";
@@ -45,7 +45,8 @@
                             type="text"
                             id="login"
                             name="login"
-                            placeholder="Укажите Ваш логин"
+                            placeholder="<%= user_login ? user_login : 'Укажите Ваш логин' %>"
+                            value="<%= user_login ? user_login : '' %>"
                             aria-label=".form-control-lg example"
                         >
                     </div>

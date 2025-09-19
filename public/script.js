@@ -127,6 +127,15 @@ text.addEventListener("keydown", (e) => {
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
+const profile = document.querySelector("#profile");
+const logout = document.querySelector("#logout");
+
+profile.addEventListener("click", () => {
+    location.href = '/profile';
+});
+logout.addEventListener("click", () => {
+    location.href = '/logout';
+});
 muteButton.addEventListener("click", () => {
     const enabled = myVideoStream.getAudioTracks()[0].enabled;
     if (enabled) {
