@@ -29,10 +29,32 @@
 
 #profile {
   float: left;
+  cursor:pointer;
 }
 
 #logout {
   float: right;
+  cursor:pointer;
+}
+
+#stopVideo {
+  cursor:pointer;
+}
+
+#muteButton {
+  cursor:pointer;
+}
+
+#showChat {
+  cursor:pointer;
+}
+
+#inviteButton {
+  cursor:pointer;
+}
+
+#send {
+  cursor:pointer;
 }
 
 .hello {
