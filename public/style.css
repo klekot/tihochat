@@ -27,6 +27,15 @@
   color: var(--main-light);
 }
 
+.main > h1, h2, h3, h4, h5, h6 {
+  text-align: center;
+  color: var(--main-light) !important;
+}
+
+p, span {
+  color: var(--main-light) !important;
+}
+
 #profile {
   float: left;
   cursor:pointer;

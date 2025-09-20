@@ -17,7 +17,7 @@
         <div class="header__back">
             <i class="fas fa-angle-left"></i>
         </div>
-        <h1>Tiho Chat / До свидания, <%= sessionUser.name %>!</h1>
+        <h1>Tiho Chat</h1>
     </div>
 </div>
 <div class="main">
@@ -25,6 +25,13 @@
         <div class="form__container">
             <main class="form-signin w-100 m-auto">
                 <form action="/logout" method="post">
+                    <h3>До свидания, <%= sessionUser.name %>!</h3>
+                    <p>
+                        Обратите внимание, что если Вы выйдете из ТихоЧата, то при следующем входе
+                        Вам потребуется повторно вводить логин и пароль.
+                        Если Вы хотите завершить сеанс связи, но при следующем входе не вводить логин и пароль,
+                        тогда просто закройте вкладку браузера с ТихоЧатом.
+                    </p>
                     <div class="d-grid gap-2 col-12 mx-auto">
                         <button class="btn btn-outline-light btn-lg" type="submit">Выйти из ТихоЧата</button>
                     </div>

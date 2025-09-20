@@ -3,6 +3,7 @@ let https = require("https");
 const config = require("config");
 const express = require('express');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser');
 const app = express();
 const { readFileSync } = require("fs");
@@ -25,6 +26,38 @@ let con = mysql.createConnection({
     database: config.get('db.database')
 });
 
+const sessionStoreOptions = {
+    host: config.get('db.host'),
+    user: config.get('db.user'),
+    password: config.get('db.password'),
+    database: config.get('db.database'),
+    clearExpired: true,
+    checkExpirationInterval: 900000,
+    expiration: 86400000,
+    createDatabaseTable: true,
+    endConnectionOnClose: false,
+    disableTouch: false,
+    charset: 'utf8mb4_bin',
+    schema: {
+        tableName: 'sessions',
+        columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+        }
+    }
+};
+
+const sessionStore = new MySQLStore(sessionStoreOptions, con);
+
+const authenticateSession = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/');
+    }
+};
+
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 // Parse request bodies
@@ -33,23 +66,36 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Configure sessions
 app.use(session({
     secret: config.get('session.secret'),
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
+// Optionally use onReady() to get a promise that resolves when store is ready.
+sessionStore.onReady().then(() => {
+    // MySQL session store ready for use.
+    console.log('MySQLStore ready');
+}).catch(error => {
+    // Something went wrong.
+    console.error(error);
+});
 app.use("/",express.static("./node_modules/bootstrap/dist/"));
 
 ///////////START OF ROUTES///////////
 app.get('/', (req, res) => {
-    res.render('index');
+    if (!req.session.user) {
+        res.render('index');
+    } else {
+        res.redirect(`/room/${ulid()}`);
+    }
 });
-app.get('/room/:room', (req, res) => {
+app.get('/room/:room', authenticateSession, (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
-        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
+        res.redirect('/');
+    } else {
+        res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
     }
-
-    res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
 });
 
 // Invite checking out
@@ -59,7 +105,6 @@ app.get('/invite', (req, res) => {
 });
 app.post('/invite', (req, res) => {
     const { invite } = req.body;
-    // inviteGlobal = invite;
     con.connect(async function(err) {
         let sql = `SELECT * FROM invites WHERE invite_key='${invite}'`;
         con.query(sql, function (err, result, fields) {
@@ -118,6 +163,7 @@ app.post('/registration', (req, res) => {
                                 res.redirect(`/room/${ulid()}`);
                             });
                         } else {
+                            // Something wrong, just registered user didn't get a record in the users table
                             res.status(500).render('error_pages/500.ejs');
                         }
                     });
@@ -158,33 +204,42 @@ app.post('/login', (req, res) => {
 });
 
 // Protected route
-app.get('/profile', (req, res) => {
+app.get('/profile', authenticateSession, (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
-        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
+        res.redirect('/');
+    } else {
+        res.render('profile', { sessionUser: req.session.user });
     }
-
-    res.render('profile', { sessionUser: req.session.user });
 });
 
 // Logout route
-app.get('/logout', (req, res) => {
+app.get('/logout', authenticateSession, (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
-        res.status(401).render('error_pages/401.ejs', { message: 'Unauthorized' });
+        res.redirect('/');
+    } else {
+        res.render('logout', { sessionUser: req.session.user });
     }
-
-    res.render('logout', { sessionUser: req.session.user });
 });
 app.post('/logout', (req, res) => {
+    sessionStore.close().then(() => {
+        // Successfully closed the MySQL session store.
+        console.log('MySQLStore closed');
+    }).catch(error => {
+        // Something went wrong.
+        console.error(error);
+    });
     // Destroy session
     req.session.destroy((err) => {
         if (err) {
             res.status(500).render('error_pages/500.ejs', { message: 'Logout failed' });
+        } else {
+            res.redirect(`/`);
         }
-        res.redirect(`/`);
     });
 });
+
 ///////////END OF ROUTES/////////////
 
 io.on("connection", (socket) => {
