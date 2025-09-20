@@ -89,6 +89,19 @@ app.get('/', (req, res) => {
         res.redirect(`/room/${ulid()}`);
     }
 });
+
+app.get('/room/:room/:invite', (req, res) => {
+    // Check if user is logged in
+    if (!req.session.user) {
+        if (req.params.room && req.params.invite) {
+            res.redirect(`/registration?room=${req.params.room}&invite=${req.params.invite}`);
+        } else {
+            res.redirect('/');
+        }
+    } else {
+        res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
+    }
+});
 app.get('/room/:room', authenticateSession, (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
@@ -111,19 +124,14 @@ app.post('/invite', (req, res) => {
             if (result && result.length) {
                 let json =  JSON.parse(JSON.stringify(result));
                 let person = json[0].person;
-                let inviteId = json[0].invite_id;
-                if (json[0].invite_key === invite) {
-                    if (json[0].user_id) { // already linked to user
-                        sql = `SELECT * FROM users WHERE user_id='${json[0].user_id}'`;
-                        con.query(sql, function (err, result, fields) {
-                            let json = JSON.parse(JSON.stringify(result));
-                            res.redirect(`/login?success=1&user_name=${json[0].name}&user_login=${json[0].login}`);
-                        });
-                    } else {
-                        res.redirect(`/registration?person=${person}&invite_id=${inviteId}`);
-                    }
+                if (json[0].user_id) { // already linked to user
+                    sql = `SELECT * FROM users WHERE user_id='${json[0].user_id}'`;
+                    con.query(sql, function (err, result, fields) {
+                        let json = JSON.parse(JSON.stringify(result));
+                        res.redirect(`/login?success=1&user_name=${json[0].name}&user_login=${json[0].login}`);
+                    });
                 } else {
-                    res.redirect(`/invite?success=0`);
+                    res.redirect(`/registration?person=${person}&invite=${invite}`);
                 }
             } else {
                 res.redirect(`/invite?success=0`);
@@ -135,15 +143,55 @@ app.post('/invite', (req, res) => {
 // Registration route
 app.get('/registration', (req, res) => {
     let {query} = req;
-    res.render('registration', {person: query.person, invite_id: query.invite_id});
+    if (!query.room) {
+        res.render('registration', {person: query.person, invite: query.invite});
+    } else {
+        con.connect(async function(err) {
+            // checking out is invite exists
+            let sql = `SELECT * FROM invites WHERE invite_key='${query.invite}'`;
+            con.query(sql, function (err, result, fields) {
+                if (result && result.length) {
+                    let json = JSON.parse(JSON.stringify(result));
+                    let name = json[0].person;
+                    console.log('name is: ' + name);
+                    let login = 'user_' + Date.now();
+                    let password = config.get('default.password');
+                    let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
+                    console.log('inserted');
+                    con.query(sql, function (err, result, fields) {
+                        let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
+                        con.query(sql, function (err, result, fields) {
+                            if (result && result.length) {
+                                let json = JSON.parse(JSON.stringify(result));
+                                let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_key=${query.invite} `;
+                                con.query(sql, function (err, result, fields) {
+                                    // Store user information in session (excluding password)
+                                    req.session.user = {
+                                        id: json[0].user_id,
+                                        login: json[0].login,
+                                        name: json[0].name
+                                    };
+                                    res.redirect(`/room/${query.room}`);
+                                });
+                            } else {
+                                // Something wrong, just registered user didn't get a record in the users table
+                                res.status(500).render('error_pages/500.ejs');
+                            }
+                        });
+                    });
+                } else {
+                    res.redirect(`/invite?success=0`);
+                }
+            });
+        });
+    }
 });
 app.post('/registration', (req, res) => {
-    const { invite_id, name, login, password } = req.body;
+    const { invite, name, login, password } = req.body;
 
-    // Find user
     con.connect(async function(err) {
         // checking out is invite exists
-        let sql = `SELECT * FROM invites WHERE invite_id='${invite_id}'`;
+        let sql = `SELECT * FROM invites WHERE invite_key='${invite}'`;
         con.query(sql, function (err, result, fields) {
             if (result && result.length) {
                 let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
@@ -152,7 +200,7 @@ app.post('/registration', (req, res) => {
                     con.query(sql, function (err, result, fields) {
                         if (result && result.length) {
                             let json = JSON.parse(JSON.stringify(result));
-                            let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_id=${invite_id} `;
+                            let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_key=${invite} `;
                             con.query(sql, function (err, result, fields) {
                                 // Store user information in session (excluding password)
                                 req.session.user = {
