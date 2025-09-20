@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <script src="/js/bootstrap.js"></script>
     <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
+    <script src="/utils.js" defer></script>
 </head>
 <body>
 <div class="header">
@@ -17,13 +18,75 @@
         <div class="header__back">
             <i class="fas fa-angle-left"></i>
         </div>
-        <h1>Tiho Chat / Настройки профиля / <%= sessionUser.name %></h1>
+        <h1>Tiho Chat</h1>
     </div>
 </div>
 <div class="main">
     <div class="main__common">
         <div class="form__container">
+            <div class="hello">
+                <h3>Настройки профиля "<%= sessionUser.name %>"</h3>
+            </div>
             <main class="form-signin w-100 m-auto">
+                <form action="/profile" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="user_id" name="user_id" value="<%= sessionUser.id %>">
+                    <div class="form-group mb-3">
+                        <p class="center"><img id="preview" src="<%= (sessionUser.avatar) ? '/' + sessionUser.id + '/' + sessionUser.avatar : '/default_avatar.jpg' %>" alt="Ваша аватарка" /></p>
+                        <label for="avatar">Сменить аватарку:</label>
+                        <span class="chooseAvatar">
+                            <input
+                                class="form-control-file"
+                                type="file"
+                                id="avatar"
+                                name="avatar"
+                                onchange="previewImage()"
+                            >
+<!--                            <button class="btn btn-primary" type="submit" onclick="avatar.click();">Выбрать файл...</button>-->
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name">Сменить имя:</label>
+                        <input
+                            class="form-control form-control-lg"
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="<%= sessionUser.name %>"
+                            aria-label=".form-control-lg example"
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label for="login">Сменить логин:</label>
+                        <input
+                            class="form-control form-control-lg"
+                            type="text"
+                            id="login"
+                            name="login"
+                            placeholder="<%= sessionUser.login %>"
+                            aria-label=".form-control-lg example"
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label for="password">Сменить пароль:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control form-control-lg"
+                            placeholder="Введите новый пароль"
+                            aria-label=".form-control-lg example"
+                        >
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" value="" id="checkDefault" onclick="togglePasswordVisibility()">
+                            <label class="form-check-label" for="checkDefault">
+                                <span class="show__password">Показать пароль</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 col-12 mx-auto">
+                        <button class="btn btn-outline-light btn-lg" type="submit">Сохранить</button>
+                    </div>
+                </form>
             </main>
         </div>
     </div>

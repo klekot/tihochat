@@ -50,7 +50,7 @@ showChat.addEventListener("click", () => {
     document.querySelector(".main__left").style.display = "none";
     document.querySelector(".header__back").style.display = "block";
 });
-const user = CURRENT_USER //prompt("Enter your name");
+const user = CURRENT_USER_NAME; //prompt("Enter your name");
 const peers = {}
 
 let myVideoStream;

@@ -6,10 +6,13 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser');
 const app = express();
-const { readFileSync } = require("fs");
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const upload = multer({ dest: 'tmp/' });
 const httpsServer = https.createServer({
-    key: readFileSync(config.get('ssl.key')),
-    cert: readFileSync(config.get('ssl.cert'))
+    key: fs.readFileSync(config.get('ssl.key')),
+    cert: fs.readFileSync(config.get('ssl.cert'))
 }, app);
 const { ulid } = require('ulid');
 const { Server } = require("socket.io");
@@ -60,6 +63,7 @@ const authenticateSession = (req, res, next) => {
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 // Parse request bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,7 +83,7 @@ sessionStore.onReady().then(() => {
     // Something went wrong.
     console.error(error);
 });
-app.use("/",express.static("./node_modules/bootstrap/dist/"));
+app.use("/", express.static("./node_modules/bootstrap/dist/"));
 
 ///////////START OF ROUTES///////////
 app.get('/', (req, res) => {
@@ -99,7 +103,7 @@ app.get('/room/:room/:invite', (req, res) => {
             res.redirect('/');
         }
     } else {
-        res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
+        res.render('room', { roomId: req.params.room, currentUser: req.session.user });
     }
 });
 app.get('/room/:room', authenticateSession, (req, res) => {
@@ -107,7 +111,7 @@ app.get('/room/:room', authenticateSession, (req, res) => {
     if (!req.session.user) {
         res.redirect('/');
     } else {
-        res.render('room', { roomId: req.params.room, currentUser: req.session.user.name });
+        res.render('room', { roomId: req.params.room, currentUser: req.session.user });
     }
 });
 
@@ -169,7 +173,8 @@ app.get('/registration', (req, res) => {
                                     req.session.user = {
                                         id: json[0].user_id,
                                         login: json[0].login,
-                                        name: json[0].name
+                                        name: json[0].name,
+                                        avatar: json[0].avatar
                                     };
                                     res.redirect(`/room/${query.room}`);
                                 });
@@ -206,7 +211,8 @@ app.post('/registration', (req, res) => {
                                 req.session.user = {
                                     id: json[0].user_id,
                                     login: json[0].login,
-                                    name: json[0].name
+                                    name: json[0].name,
+                                    avatar: json[0].avatar
                                 };
                                 res.redirect(`/room/${ulid()}`);
                             });
@@ -241,7 +247,8 @@ app.post('/login', (req, res) => {
                 req.session.user = {
                     id: json[0].user_id,
                     login: json[0].login,
-                    name: json[0].name
+                    name: json[0].name,
+                    avatar: json[0].avatar
                 };
                 res.redirect(`/room/${ulid()}`);
             } else {
@@ -259,6 +266,60 @@ app.get('/profile', authenticateSession, (req, res) => {
     } else {
         res.render('profile', { sessionUser: req.session.user });
     }
+});
+
+const handleError = (err, res) => {
+    res.status(500).contentType("text/plain").end("Oops! Something went wrong!");
+};
+app.post("/profile", upload.single("avatar"), (req, res) => {
+    const { user_id, name, login, password } = req.body;
+    const avatar = req.file.originalname;
+    const tempPath = req.file.path;
+    const userDir = "./uploads/" + req.session.user.id;
+    if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir);
+    }
+    const targetPath = path.join(__dirname, userDir + "/" + avatar);
+
+    const allowedExtensions = [".png", ".jpg", ".jpeg"];
+    if (allowedExtensions.includes(path.extname(avatar).toLowerCase())) {
+        fs.rename(tempPath, targetPath, err => {
+            if (err) return handleError(err, res);
+            fs.unlink(tempPath, err => {});
+        });
+    } else {
+        fs.unlink(tempPath, err => {
+            if (err) return handleError(err, res);
+            res.status(403).contentType("text/plain").end("Only .png, .jpg, .jpeg files are allowed!");
+        });
+    }
+
+    con.connect(async function(err) {
+        let addFields = ``;
+        if (avatar) addFields += `,avatar='${avatar}'`;
+        if (password) addFields += `,password=PASSWORD('${password}')`;
+        let sql = `UPDATE users SET name='${name}', login='${login}' ` + addFields + ` WHERE user_id='${user_id}'`;
+        console.log(sql);
+        con.query(sql, function (err, result, fields) {
+            let sql = `SELECT * FROM users WHERE user_id=${user_id}`;
+            con.query(sql, function (err, result, fields) {
+                if (result && result.length === 1) {
+                    let json = JSON.parse(JSON.stringify(result));
+                    // Store user information in session (excluding password)
+                    req.session.user = {
+                        id: json[0].user_id,
+                        login: json[0].login,
+                        name: json[0].name,
+                        avatar: json[0].avatar
+                    };
+                    res.redirect(`/room/${ulid()}`);
+                } else {
+                    // Something wrong, just updated user didn't get a record in the users table
+                    res.status(500).render('error_pages/500.ejs');
+                }
+            });
+        });
+    });
 });
 
 // Logout route
