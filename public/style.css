@@ -286,7 +286,17 @@ video {
   position: fixed;
 }
 
+h1.mobile-header {
+  display: none;
+}
+
 @media (max-width: 700px) {
+  * {
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+  }
+
   .main__right {
     display: none;
   }
@@ -296,14 +306,17 @@ video {
   }
 
   h1.mobile-header {
+    display: block;
     left: 20px;
     position: fixed;
     font-size: xx-large;
     color: var(--main-light);
   }
+
   .main__left {
     width: 100%;
     flex: 1;
+    overflow-y: auto;
   }
 
   video {
