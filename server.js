@@ -273,25 +273,28 @@ const handleError = (err, res) => {
 };
 app.post("/profile", upload.single("avatar"), (req, res) => {
     const { user_id, name, login, password } = req.body;
-    const avatar = req.file.originalname;
-    const tempPath = req.file.path;
-    const userDir = "./uploads/" + req.session.user.id;
-    if (!fs.existsSync(userDir)) {
-        fs.mkdirSync(userDir);
-    }
-    const targetPath = path.join(__dirname, userDir + "/" + avatar);
+    let avatar = null;
+    if (req.file) {
+        avatar = req.file.originalname;
+        const tempPath = req.file.path;
+        const userDir = "./uploads/" + req.session.user.id;
+        if (!fs.existsSync(userDir)) {
+            fs.mkdirSync(userDir);
+        }
+        const targetPath = path.join(__dirname, userDir + "/" + avatar);
 
-    const allowedExtensions = [".png", ".jpg", ".jpeg"];
-    if (allowedExtensions.includes(path.extname(avatar).toLowerCase())) {
-        fs.rename(tempPath, targetPath, err => {
-            if (err) return handleError(err, res);
-            fs.unlink(tempPath, err => {});
-        });
-    } else {
-        fs.unlink(tempPath, err => {
-            if (err) return handleError(err, res);
-            res.status(403).contentType("text/plain").end("Only .png, .jpg, .jpeg files are allowed!");
-        });
+        const allowedExtensions = [".png", ".jpg", ".jpeg"];
+        if (allowedExtensions.includes(path.extname(avatar).toLowerCase())) {
+            fs.rename(tempPath, targetPath, err => {
+                if (err) return handleError(err, res);
+                fs.unlink(tempPath, err => {});
+            });
+        } else {
+            fs.unlink(tempPath, err => {
+                if (err) return handleError(err, res);
+                res.status(403).contentType("text/plain").end("Only .png, .jpg, .jpeg files are allowed!");
+            });
+        }
     }
 
     con.connect(async function(err) {
@@ -352,13 +355,27 @@ app.post('/logout', (req, res) => {
 ///////////END OF ROUTES/////////////
 
 io.on("connection", (socket) => {
-    socket.on("join-room", (roomId, userId, userName) => {
+    // Here variable userId means user id in peer.js server and dbUserId means users.user_id field in DB
+    socket.on("join-room", (roomId, userId, dbUserId, userName) => {
         socket.join(roomId);
-        setTimeout(()=>{
+        setTimeout(() => {
             socket.to(roomId).emit("user-connected", userId);
         }, 1000);
         socket.on("message", (message) => {
-            io.to(roomId).emit("createMessage", message, userName);
+            con.connect(async function(err) {
+                let sql = `SELECT * FROM users WHERE user_id='${dbUserId}'`;
+                console.log(sql);
+                con.query(sql, function (err, result, fields) {
+                    let avatarUrl = '/default_avatar.jpg';
+                    if (result && result.length === 1) {
+                        let json = JSON.parse(JSON.stringify(result));
+                        avatar = json[0].avatar;
+                        console.log('ava is ' + avatar);
+                        avatarUrl = (avatar) ? '/' + dbUserId + '/' + avatar : '/default_avatar.jpg';
+                    }
+                    io.to(roomId).emit("createMessage", message, userName, avatarUrl);
+                });
+            });
         });
     });
 });
