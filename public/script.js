@@ -50,7 +50,7 @@ showChat.addEventListener("click", () => {
     document.querySelector(".main__left").style.display = "none";
     document.querySelector(".header__back").style.display = "block";
 });
-const user = CURRENT_USER //prompt("Enter your name");
+const user = CURRENT_USER; //prompt("Enter your name");
 const peers = {}
 
 let myVideoStream;
@@ -79,10 +79,8 @@ navigator.mediaDevices.getUserMedia({
     })
 })
 
-socket.emit('join-room', ROOM_ID, 10)
-
 myPeer.on('open', id => {
-    socket.emit('join-room', ROOM_ID, id, user)
+    socket.emit('join-room', ROOM_ID, id, USER_ID, user)
 })
 
 function connectToNewUser(userId, stream) {
@@ -173,12 +171,12 @@ inviteButton.addEventListener("click", (e) => {
     );
 });
 
-socket.on("createMessage", (message, userName) => {
+socket.on("createMessage", (message, userName, avatarUrl) => {
     if (userName !== null) {
         messages.innerHTML =
             messages.innerHTML +
             `<div class="message">
-            <b><i class="far fa-user-circle"></i> <span> ${userName === user ? 'Я' : userName
+            <b><img id="chat-avatar" src="${avatarUrl}" alt="Ваша аватарка" /> <span>&nbsp;&nbsp; ${userName === user ? 'Я' : userName
                 }</span> </b>
             <span>${message}</span>
             </div>`;

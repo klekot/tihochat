@@ -1,3 +1,8 @@
+Version 1.3.0:
+ - add user avatars to the chat messages
+ - add upload user avatars and profile update
+ - auto-registration by direct link to room
+
 Version 1.2.0:
  - Add session store and session-based authentication
  - add pointers to buttons in the room

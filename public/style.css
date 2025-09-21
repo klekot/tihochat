@@ -27,15 +27,6 @@
   color: var(--main-light);
 }
 
-.main > h1, h2, h3, h4, h5, h6 {
-  text-align: center;
-  color: var(--main-light) !important;
-}
-
-p, span {
-  color: var(--main-light) !important;
-}
-
 #profile {
   float: left;
   cursor:pointer;
@@ -71,6 +62,10 @@ p, span {
   text-align: center;
 }
 
+.chooseAvatar {
+  padding-left: 30px;
+}
+
 p.center {
   text-align: center;
   color: var(--main-light);
@@ -86,10 +81,35 @@ span.show__password {
   color: var(--main-light);
 }
 
+img#preview {
+  max-width: 400px;
+  max-height: 400px;
+  border-radius: 50%;
+  border: solid white;
+  margin: 30px;
+}
+
+img#user-avatar {
+  max-width: 45px;
+  max-height: 45px;
+  border-radius: 10%;
+  border: solid var(--primary-color);
+  /*margin: 30px;*/
+}
+
+img#chat-avatar {
+  max-width: 35px;
+  max-height: 45px;
+  border-radius: 50%;
+  border: solid var(--primary-color);
+  /*margin: 30px;*/
+}
+
 .main {
   overflow: hidden;
   height: 92vh;
   display: flex;
+  color: var(--main-light);
 }
 
 .main__common {
@@ -156,6 +176,18 @@ video {
   margin: 0 0.5rem;
 }
 
+.options__button__profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  border-radius: 5px;
+  color: var(--main-light);
+  font-size: 1.2rem;
+  width: 50px;
+  margin: 0 0.5rem;
+}
+
 .background__red {
   background-color: #f6484a;
 }
@@ -201,6 +233,7 @@ video {
 .message {
   display: flex;
   flex-direction: column;
+  color: var(--main-darklg);
 }
 
 .message > b {
