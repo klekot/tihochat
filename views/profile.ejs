@@ -27,6 +27,9 @@
             <div class="hello">
                 <h3>Настройки профиля "<%= sessionUser.name %>"</h3>
             </div>
+            <p class="please-message">
+                Пожалуйста, загружайте КВАДРАТНУЮ картинку с максимальным разрешением 400X400 пикселей и размером не более 1Мб
+            </p>
             <main class="form-signin w-100 m-auto">
                 <form action="/profile" method="post" enctype="multipart/form-data">
                     <input type="hidden" id="user_id" name="user_id" value="<%= sessionUser.id %>">
