@@ -42,6 +42,7 @@ backBtn.addEventListener("click", () => {
     document.querySelector(".main__left").style.flex = "1";
     document.querySelector(".main__right").style.display = "none";
     document.querySelector(".header__back").style.display = "none";
+    document.querySelector(".mobile-header").style.display = "block";
 });
 
 showChat.addEventListener("click", () => {
@@ -49,6 +50,7 @@ showChat.addEventListener("click", () => {
     document.querySelector(".main__right").style.flex = "1";
     document.querySelector(".main__left").style.display = "none";
     document.querySelector(".header__back").style.display = "block";
+    document.querySelector(".mobile-header").style.display = "none";
 });
 const user = CURRENT_USER; //prompt("Enter your name");
 const peers = {}
@@ -98,6 +100,7 @@ function connectToNewUser(userId, stream) {
 
 function addVideoStream(video, stream) {
     video.srcObject = stream
+    video.controls = true
     video.addEventListener('loadedmetadata', () => {
         video.play()
         videoGrid.append(video)
@@ -166,7 +169,7 @@ stopVideo.addEventListener("click", () => {
 
 inviteButton.addEventListener("click", (e) => {
     prompt(
-        "Copy this link and send it to people you want to meet with",
+        "Скопируйте эту ссылку на данный видеочат и отправьте ее своим собеседникам (для установки соединения они должны быть также авторизованы на данном сайте)",
         window.location.href
     );
 });

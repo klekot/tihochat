@@ -278,6 +278,7 @@ video {
   top: 17px;
   left: 28px;
   color: #fff;
+  cursor: pointer;
 }
 
 .header__options {
@@ -286,17 +287,22 @@ video {
 }
 
 @media (max-width: 700px) {
-  body {
-    overflow: hidden;
-  }
-
   .main__right {
     display: none;
   }
+  
+  h1.tihochat-header {
+    display: none;
+  }
+
+  h1.mobile-header {
+    left: 20px;
+    position: fixed;
+    font-size: xx-large;
+    color: var(--main-light);
+  }
   .main__left {
     width: 100%;
-    height: auto;
-    overflow: auto;
     flex: 1;
   }
 
