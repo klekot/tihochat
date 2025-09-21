@@ -157,17 +157,17 @@ app.get('/registration', (req, res) => {
                 if (result && result.length) {
                     let json = JSON.parse(JSON.stringify(result));
                     let name = json[0].person;
+                    let inviteId = json[0].invite_id;
                     console.log('name is: ' + name);
                     let login = 'user_' + Date.now();
                     let password = config.get('default.password');
                     let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
-                    console.log('inserted');
                     con.query(sql, function (err, result, fields) {
                         let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
                         con.query(sql, function (err, result, fields) {
                             if (result && result.length) {
                                 let json = JSON.parse(JSON.stringify(result));
-                                let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_key=${query.invite} `;
+                                let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_id=${inviteId} `;
                                 con.query(sql, function (err, result, fields) {
                                     // Store user information in session (excluding password)
                                     req.session.user = {
