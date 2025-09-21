@@ -1,3 +1,12 @@
+Version 1.3.2:
+ - some fix for mobile view
+ - Merge branch 'develop'
+ - Merge branch 'hotfix-1.3.1' into develop
+ - Merge branch 'hotfix-1.3.1'
+ - add message to profile page
+ - fix closing invite after making new user
+ - Merge branch 'release-1.3.0' into develop
+
 Version 1.3.1:
  - Merge branch 'release-1.3.0'
 
