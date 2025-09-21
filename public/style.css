@@ -71,6 +71,11 @@ p.center {
   color: var(--main-light);
 }
 
+p.please-message {
+  text-align: justify;
+  color: yellow;
+}
+
 p#error__message {
   color: red;
   font-weight: bold;
@@ -87,6 +92,7 @@ img#preview {
   border-radius: 50%;
   border: solid white;
   margin: 30px;
+  background-color: var(--main-light);
 }
 
 img#user-avatar {
