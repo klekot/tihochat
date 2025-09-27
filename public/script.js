@@ -132,7 +132,7 @@ const profile = document.querySelector("#profile");
 const logout = document.querySelector("#logout");
 
 profile.addEventListener("click", () => {
-    location.href = '/profile';
+    location.href = '/profile?roomId=' + ROOM_ID;
 });
 logout.addEventListener("click", () => {
     location.href = '/logout';

@@ -156,34 +156,54 @@ app.get('/registration', (req, res) => {
             con.query(sql, function (err, result, fields) {
                 if (result && result.length) {
                     let json = JSON.parse(JSON.stringify(result));
-                    let name = json[0].person;
-                    let inviteId = json[0].invite_id;
-                    console.log('name is: ' + name);
-                    let login = 'user_' + Date.now();
-                    let password = config.get('default.password');
-                    let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
-                    con.query(sql, function (err, result, fields) {
-                        let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
+                    if (json[0].user_id) {
+                        //It means this invite is already used for account creation
+                        let sql = `SELECT * FROM users WHERE user_id='${json[0].user_id}'`;
                         con.query(sql, function (err, result, fields) {
                             if (result && result.length) {
                                 let json = JSON.parse(JSON.stringify(result));
-                                let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_id=${inviteId} `;
-                                con.query(sql, function (err, result, fields) {
-                                    // Store user information in session (excluding password)
-                                    req.session.user = {
-                                        id: json[0].user_id,
-                                        login: json[0].login,
-                                        name: json[0].name,
-                                        avatar: json[0].avatar
-                                    };
-                                    res.redirect(`/room/${query.room}`);
-                                });
+                                req.session.user = {
+                                    id: json[0].user_id,
+                                    login: json[0].login,
+                                    name: json[0].name,
+                                    avatar: json[0].avatar
+                                };
+                                res.redirect(`/room/${query.room}`);
                             } else {
                                 // Something wrong, just registered user didn't get a record in the users table
                                 res.status(500).render('error_pages/500.ejs');
                             }
                         });
-                    });
+                    } else {
+                        let name = json[0].person;
+                        let inviteId = json[0].invite_id;
+                        console.log('name is: ' + name);
+                        let login = 'user_' + Date.now();
+                        let password = config.get('default.password');
+                        let sql = `INSERT INTO users (name, login, password) VALUES ('${name}', '${login}', PASSWORD('${password}'))`;
+                        con.query(sql, function (err, result, fields) {
+                            let sql = `SELECT * FROM users WHERE login='${login}' AND password = PASSWORD('${password}')`;
+                            con.query(sql, function (err, result, fields) {
+                                if (result && result.length) {
+                                    let json = JSON.parse(JSON.stringify(result));
+                                    let sql = `UPDATE invites SET user_id=${json[0].user_id} WHERE invite_id=${inviteId} `;
+                                    con.query(sql, function (err, result, fields) {
+                                        // Store user information in session (excluding password)
+                                        req.session.user = {
+                                            id: json[0].user_id,
+                                            login: json[0].login,
+                                            name: json[0].name,
+                                            avatar: json[0].avatar
+                                        };
+                                        res.redirect(`/room/${query.room}`);
+                                    });
+                                } else {
+                                    // Something wrong, just registered user didn't get a record in the users table
+                                    res.status(500).render('error_pages/500.ejs');
+                                }
+                            });
+                        });
+                    }
                 } else {
                     res.redirect(`/invite?success=0`);
                 }
@@ -260,11 +280,12 @@ app.post('/login', (req, res) => {
 
 // Protected route
 app.get('/profile', authenticateSession, (req, res) => {
+    let {query} = req;
     // Check if user is logged in
     if (!req.session.user) {
         res.redirect('/');
     } else {
-        res.render('profile', { sessionUser: req.session.user });
+        res.render('profile', { sessionUser: req.session.user, roomId: query.roomId });
     }
 });
 
