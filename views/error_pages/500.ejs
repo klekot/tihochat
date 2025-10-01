@@ -1,0 +1,24 @@
+<%- include('../layout', {
+    title: 'TihoChat - Ошибка 500',
+    showBack: false,
+    body: ''
+}) %>
+<body>
+    <div class="error-container">
+        <div class="error-content">
+            <h1 class="error-code">500</h1>
+            <h2 class="error-title">Внутренняя ошибка сервера</h2>
+            <p class="error-message">
+                <%= message || 'Произошла внутренняя ошибка сервера. Пожалуйста, попробуйте позже.' %>
+            </p>
+            <% if (error && process.env.NODE_ENV === 'development') { %>
+                <div class="error-details">
+                    <pre><%= error %></pre>
+                </div>
+            <% } %>
+            <div class="error-actions">
+                <a href="/" class="btn btn-outline-light btn-lg">Вернуться на главную</a>
+            </div>
+        </div>
+    </div>
+</body>

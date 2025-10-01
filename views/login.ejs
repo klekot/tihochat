@@ -2,77 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TihoChat</title>
+    <title>TihoChat - Вход</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/style.css" />
-    <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    
+    <!-- JavaScript -->
     <script src="/js/bootstrap.js"></script>
+    <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
     <script src="/utils.js" defer></script>
+    
+    <script>
+        const success = "<%= success %>";
+        const p = document.getElementById("error__message");
+        if (success === "0") {
+            p.innerHTML = 'Введены неверные данные. Повторите попытку';
+        }
+    </script>
 </head>
 <body>
-<div class="header">
-    <div class="logo">
-        <div class="header__back">
-            <i class="fas fa-angle-left"></i>
-        </div>
-        <h1>TihoChat</h1>
-    </div>
-</div>
-<div class="main">
-    <div class="main__common">
-        <div class="form__container">
-            <div class="hello">
-                <h3><%= user_name ? 'Здравствуйте, ' + user_name + '!' : '' %></h3>
-            </div>
-            <p class="center" id="error__message">
-                <script>
-                    const success = "<%= success %>";
-                    const p = document.getElementById("error__message");
-                    if (success === "0") {
-                        p.innerHTML = 'Введены неверные данные. Повторите попытку';
-                    }
-                </script>
-            </p>
-            <p class="center">Для входа укажите логин и пароль, созданные Вами при регистрации</p>
-            <main class="form-signin w-100 m-auto">
-                <form action="/login" method="post">
-                    <div class="mb-3">
-                        <input
-                            class="form-control form-control-lg"
-                            type="text"
-                            id="login"
-                            name="login"
-                            placeholder="<%= user_login ? user_login : 'Укажите Ваш логин' %>"
-                            value="<%= user_login ? user_login : '' %>"
-                            aria-label=".form-control-lg example"
-                        >
-                    </div>
-                    <div class="mb-3">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control form-control-lg"
-                            placeholder="Введите Ваш пароль"
-                            aria-label=".form-control-lg example"
-                        >
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" value="" id="checkDefault" onclick="togglePasswordVisibility()">
-                            <label class="form-check-label" for="checkDefault">
-                                <span class="show__password">Показать пароль</span>
-                            </label>
+    <!-- Header -->
+    <%- include('partials/header', { 
+        showBack: true,
+        title: 'TihoChat',
+        user: null,
+        roomId: null
+    }) %>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <div class="main__common">
+            <div class="form__container">
+                <div class="hello">
+                    <h3><%= user_name ? 'Здравствуйте, ' + user_name + '!' : '' %></h3>
+                </div>
+                <p class="center" id="error__message"></p>
+                <p class="center">Для входа укажите логин и пароль, созданные Вами при регистрации</p>
+
+                <main class="form-signin w-100 m-auto">
+                    <form action="/login" method="post">
+                        <div class="mb-3">
+                            <input
+                                class="form-control form-control-lg"
+                                type="text"
+                                id="login"
+                                name="login"
+                                placeholder="<%= user_login ? user_login : 'Укажите Ваш логин' %>"
+                                value="<%= user_login ? user_login : '' %>"
+                                aria-label=".form-control-lg example"
+                            >
                         </div>
-                    </div>
-                    <div class="d-grid gap-2 col-12 mx-auto">
-                        <button class="btn btn-outline-light btn-lg" type="submit">Войти</button>
-                    </div>
-                </form>
-            </main>
+                        <div class="mb-3">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control form-control-lg"
+                                placeholder="Введите Ваш пароль"
+                                aria-label=".form-control-lg example"
+                            >
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" value="" id="checkDefault" onclick="togglePasswordVisibility()">
+                                <label class="form-check-label" for="checkDefault">
+                                    <span class="show__password">Показать пароль</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 col-12 mx-auto">
+                            <button class="btn btn-outline-light btn-lg" type="submit">Войти</button>
+                        </div>
+                    </form>
+                </main>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>

@@ -1,103 +1,108 @@
 <!doctype html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TihoChat</title>
+    <title>TihoChat - Профиль</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    
+    <!-- JavaScript -->
     <script src="/js/bootstrap.js"></script>
     <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
     <script src="/utils.js" defer></script>
 </head>
 <body>
-<div class="header">
-    <div class="logo">
-        <div class="header__back">
-            <i class="fas fa-angle-left"></i>
-        </div>
-        <h1>TihoChat</h1>
-    </div>
-</div>
-<div class="main">
-    <div class="main__common">
-        <div class="form__container">
-            <div class="hello">
-                <h3>Настройки профиля "<%= sessionUser.name %>"</h3>
-            </div>
-            <p class="please-message">
-                Пожалуйста, загружайте КВАДРАТНУЮ картинку с максимальным разрешением 400X400 пикселей и размером не более 1Мб
-            </p>
-            <main class="form-signin w-100 m-auto">
-                <form action="/profile" method="post" enctype="multipart/form-data">
-                    <input type="hidden" id="user_id" name="user_id" value="<%= sessionUser.id %>">
-                    <div class="form-group mb-3">
-                        <p class="center"><img id="preview" src="<%= (sessionUser.avatar) ? '/' + sessionUser.id + '/' + sessionUser.avatar : '/default_avatar.jpg' %>" alt="Ваша аватарка" /></p>
-                        <label for="avatar">Сменить аватарку:</label>
-                        <span class="chooseAvatar">
+    <!-- Header -->
+    <%- include('partials/header', { 
+        showBack: true,
+        title: 'TihoChat',
+        user: null,
+        roomId: null
+    }) %>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <div class="main__common">
+            <div class="form__container">
+                <div class="hello">
+                    <h3>Настройки профиля "<%= sessionUser.name %>"</h3>
+                </div>
+                <p class="please-message">
+                    Пожалуйста, загружайте КВАДРАТНУЮ картинку с максимальным разрешением 400X400 пикселей и размером не более 1Мб
+                </p>
+
+                <main class="form-signin w-100 m-auto">
+                    <form action="/profile" method="post" enctype="multipart/form-data">
+                        <input type="hidden" id="user_id" name="user_id" value="<%= sessionUser.id %>">
+                        <input type="hidden" id="room_id" name="room_id" value="<%= roomId || '' %>">
+                        <div class="form-group mb-3">
+                            <p class="center"><img id="preview" src="<%= (sessionUser.avatar) ? '/' + sessionUser.id + '/' + sessionUser.avatar : '/default_avatar.jpg' %>" alt="Ваша аватарка" /></p>
+                            <label for="avatar">Сменить аватарку:</label>
+                            <span class="chooseAvatar">
+                                <input
+                                    class="form-control-file"
+                                    type="file"
+                                    id="avatar"
+                                    name="avatar"
+                                    onchange="previewImage()"
+                                >
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name">Сменить имя:</label>
                             <input
-                                class="form-control-file"
-                                type="file"
-                                id="avatar"
-                                name="avatar"
-                                onchange="previewImage()"
+                                class="form-control form-control-lg"
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="<%= sessionUser.name %>"
+                                value="<%= sessionUser.name %>"
+                                aria-label=".form-control-lg example"
                             >
-<!--                            <button class="btn btn-primary" type="submit" onclick="avatar.click();">Выбрать файл...</button>-->
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="name">Сменить имя:</label>
-                        <input
-                            class="form-control form-control-lg"
-                            type="text"
-                            id="name"
-                            name="name"
-                            placeholder="<%= sessionUser.name %>"
-                            value="<%= sessionUser.name %>"
-                            aria-label=".form-control-lg example"
-                        >
-                    </div>
-                    <div class="mb-3">
-                        <label for="login">Сменить логин:</label>
-                        <input
-                            class="form-control form-control-lg"
-                            type="text"
-                            id="login"
-                            name="login"
-                            placeholder="<%= sessionUser.login %>"
-                            value="<%= sessionUser.login %>"
-                            aria-label=".form-control-lg example"
-                        >
-                    </div>
-                    <div class="mb-3">
-                        <label for="password">Сменить пароль:</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control form-control-lg"
-                            placeholder="Введите новый пароль"
-                            aria-label=".form-control-lg example"
-                        >
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" value="" id="checkDefault" onclick="togglePasswordVisibility()">
-                            <label class="form-check-label" for="checkDefault">
-                                <span class="show__password">Показать пароль</span>
-                            </label>
                         </div>
-                    </div>
-                    <div class="d-grid gap-2 col-12 mx-auto">
-                        <div class="btn-group">
-                            <a class="btn btn-outline-light btn-lg col-6" href="<%= '/room/' + roomId %>" role="button">Отменить</a>
-                            <button class="btn btn-outline-light btn-lg col-6" type="submit">Сохранить</button>
+                        <div class="mb-3">
+                            <label for="login">Сменить логин:</label>
+                            <input
+                                class="form-control form-control-lg"
+                                type="text"
+                                id="login"
+                                name="login"
+                                placeholder="<%= sessionUser.login %>"
+                                value="<%= sessionUser.login %>"
+                                aria-label=".form-control-lg example"
+                            >
                         </div>
-                    </div>
-                </form>
-            </main>
+                        <div class="mb-3">
+                            <label for="password">Сменить пароль:</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control form-control-lg"
+                                placeholder="Введите новый пароль"
+                                aria-label=".form-control-lg example"
+                            >
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" value="" id="checkDefault" onclick="togglePasswordVisibility()">
+                                <label class="form-check-label" for="checkDefault">
+                                    <span class="show__password">Показать пароль</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 col-12 mx-auto">
+                            <div class="btn-group">
+                                <a class="btn btn-outline-light btn-lg col-6" href="<%= roomId ? '/room/' + roomId : '/' %>" role="button">Отменить</a>
+                                <button class="btn btn-outline-light btn-lg col-6" type="submit">Сохранить</button>
+                            </div>
+                        </div>
+                    </form>
+                </main>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>

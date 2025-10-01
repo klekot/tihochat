@@ -1,0 +1,18 @@
+<%- include('../layout', {
+    title: 'TihoChat - Ошибка 401',
+    showBack: false
+}) %>
+
+<div class="error-container">
+    <div class="error-content">
+        <h1 class="error-code">401</h1>
+        <h2 class="error-title">Не авторизован</h2>
+        <p class="error-message">
+            Для доступа к этой странице необходимо войти в систему.
+        </p>
+        <div class="error-actions">
+            <a href="/login" class="btn btn-outline-light btn-lg">Войти</a>
+            <a href="/" class="btn btn-outline-light btn-lg">На главную</a>
+        </div>
+    </div>
+</div>

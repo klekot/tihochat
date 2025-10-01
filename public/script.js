@@ -42,7 +42,6 @@ backBtn.addEventListener("click", () => {
     document.querySelector(".main__left").style.flex = "1";
     document.querySelector(".main__right").style.display = "none";
     document.querySelector(".header__back").style.display = "none";
-    document.querySelector(".mobile-header").style.display = "block";
 });
 
 showChat.addEventListener("click", () => {
@@ -50,7 +49,6 @@ showChat.addEventListener("click", () => {
     document.querySelector(".main__right").style.flex = "1";
     document.querySelector(".main__left").style.display = "none";
     document.querySelector(".header__back").style.display = "block";
-    document.querySelector(".mobile-header").style.display = "none";
 });
 const user = CURRENT_USER; //prompt("Enter your name");
 const peers = {}
@@ -61,14 +59,14 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(stream => {
     myVideoStream = stream;
-    addVideoStream(myVideo, stream)
+    addVideoStream(myVideo, stream, USER_ID)
 
     myPeer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
 
-        call.on('stream', userVideoStream => {
-            addVideoStream(video, userVideoStream)
+        call.on('stream', (userVideoStream) => {
+            addVideoStream(video, userVideoStream, USER_ID)
         })
     })
 
@@ -82,14 +80,15 @@ navigator.mediaDevices.getUserMedia({
 })
 
 myPeer.on('open', id => {
-    socket.emit('join-room', ROOM_ID, id, USER_ID, user)
+    socket.emit('join-room', ROOM_ID, id, USER_ID, user);
+    myPeer.send({ type: "userId", value: USER_ID });
 })
 
 function connectToNewUser(userId, stream) {
     const call = myPeer.call(userId, stream)
     const video = document.createElement('video')
-    call.on('stream', userVideoStream => {
-        addVideoStream(video, userVideoStream)
+    call.on('stream', (userVideoStream, userId) => {
+        addVideoStream(video, userVideoStream, userId)
     })
     call.on('close', () => {
         video.remove()
@@ -98,12 +97,16 @@ function connectToNewUser(userId, stream) {
     peers[userId] = call
 }
 
-function addVideoStream(video, stream) {
-    video.srcObject = stream
-    video.controls = true
+function addVideoStream(video, stream, userId) {
+    video.srcObject = stream;
+    video.controls = true;
     video.addEventListener('loadedmetadata', () => {
-        video.play()
-        videoGrid.append(video)
+        video.play();
+        let wrapper = document.createElement('div');
+        wrapper.classList.add("video__wrapper");
+        wrapper.setAttribute("id", `video_${userId}`);
+        wrapper.append(video);
+        videoGrid.append(wrapper);
     })
 }
 
@@ -144,11 +147,13 @@ muteButton.addEventListener("click", () => {
         html = `<i class="fas fa-microphone-slash"></i>`;
         muteButton.classList.toggle("background__red");
         muteButton.innerHTML = html;
+        socket.emit("audio_disabled", ROOM_ID, USER_ID, CURRENT_USER);
     } else {
         myVideoStream.getAudioTracks()[0].enabled = true;
         html = `<i class="fas fa-microphone"></i>`;
         muteButton.classList.toggle("background__red");
         muteButton.innerHTML = html;
+        socket.emit("audio_enabled", ROOM_ID, USER_ID, CURRENT_USER);
     }
 });
 
@@ -179,9 +184,21 @@ socket.on("createMessage", (message, userName, avatarUrl) => {
         messages.innerHTML =
             messages.innerHTML +
             `<div class="message">
-            <b><img id="chat-avatar" src="${avatarUrl}" alt="Ваша аватарка" /> <span>&nbsp;&nbsp; ${userName === user ? 'Я' : userName
+            <b><img id="chat-avatar" src="${avatarUrl}" alt="Ваша аватарка" /> <span class="message__owner">&nbsp;&nbsp; ${userName === user ? 'Я' : userName
                 }</span> </b>
             <span>${message}</span>
             </div>`;
+    }
+});
+
+socket.on("audioDisabled", (userId, userName) => {
+    if (userId !== USER_ID) {
+        alert('Пользователь "' + userName + '" выключил свой микрофон');
+    }
+});
+
+socket.on("audioEnabled", (userId, userName) => {
+    if (userId !== USER_ID) {
+        alert('Пользователь "' + userName + '" включил свой микрофон');
     }
 });
