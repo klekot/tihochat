@@ -2,45 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TihoChat</title>
+    <title>TihoChat - Выход</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    
+    <!-- JavaScript -->
     <script src="/js/bootstrap.js"></script>
     <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="header">
-    <div class="logo">
-        <div class="header__back">
-            <i class="fas fa-angle-left"></i>
+    <!-- Header -->
+    <%- include('partials/header', { 
+        showBack: true,
+        title: 'TihoChat',
+        user: null,
+        roomId: null
+    }) %>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <div class="main__common">
+            <div class="form__container">
+                <main class="form-signin w-100 m-auto">
+                    <form action="/logout" method="post">
+                        <h3>До свидания, <%= sessionUser.name %>!</h3>
+                        <p>
+                            Обратите внимание, что если Вы выйдете из ТихоЧата, то при следующем входе
+                            Вам потребуется повторно вводить логин и пароль.
+                        </p>
+                        <p>
+                            Если Вы хотите завершить сеанс связи, но при следующем входе не вводить логин и пароль,
+                            тогда просто закройте вкладку браузера с ТихоЧатом.
+                        </p>
+                        <div class="d-grid gap-2 col-12 mx-auto">
+                            <button class="btn btn-outline-light btn-lg" type="submit">Выйти из ТихоЧата</button>
+                        </div>
+                    </form>
+                </main>
+            </div>
         </div>
-        <h1>TihoChat</h1>
     </div>
-</div>
-<div class="main">
-    <div class="main__common">
-        <div class="form__container">
-            <main class="form-signin w-100 m-auto">
-                <form action="/logout" method="post">
-                    <h3>До свидания, <%= sessionUser.name %>!</h3>
-                    <p>
-                        Обратите внимание, что если Вы выйдете из ТихоЧата, то при следующем входе
-                        Вам потребуется повторно вводить логин и пароль.
-                    </p>
-                    <p>
-                        Если Вы хотите завершить сеанс связи, но при следующем входе не вводить логин и пароль,
-                        тогда просто закройте вкладку браузера с ТихоЧатом.
-                    </p>
-                    <div class="d-grid gap-2 col-12 mx-auto">
-                        <button class="btn btn-outline-light btn-lg" type="submit">Выйти из ТихоЧата</button>
-                    </div>
-                </form>
-            </main>
-        </div>
-    </div>
-</div>
 </body>
 </html>

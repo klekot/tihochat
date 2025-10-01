@@ -82,23 +82,12 @@ html {
 }
 
 body {
-  display: flex;      /* optional: useful if you want flex layout */
-  flex-direction: column;
-  min-height: 100vh;  /* ensures body is at least full viewport */
-
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--primary-light);
-  background-color: var(--primary-dark) !important;
+  background-color: var(--primary-dark);
   overflow-x: hidden;
-  padding-bottom: 30px;
-}
-
-html, body {
-  /*height: 100%;       !* take full viewport height *!*/
-  margin: 0;          /* remove default margin */
-  padding: 0;
 }
 
 /* ========================================
@@ -119,7 +108,6 @@ h6 { font-size: var(--font-size-sm); }
 
 p {
   margin-bottom: var(--spacing-md);
-  color: var(--primary-light);
 }
 
 a {
@@ -154,14 +142,15 @@ a:hover {
   justify-content: center;
   align-items: center;
   width: 100%;
-  /*min-height: 60px;*/
+  height: 8vh;
+  min-height: 60px;
   background-color: var(--primary-dark);
 }
 
 .logo {
   display: flex;
-  justify-content: center;   /* center children */
   align-items: center;
+  gap: var(--spacing-md);
 }
 
 .logo h1 {
@@ -172,11 +161,11 @@ a:hover {
 
 /* Header Navigation */
 .header__back {
-  display: none;
-  align-items: flex-start;
-  justify-content: normal;
-  width: 100px;
-  /*height: 40px;*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   color: var(--primary-light);
   cursor: pointer;
   border-radius: var(--radius-md);
@@ -193,24 +182,10 @@ a:hover {
   gap: var(--spacing-sm);
 }
 
-/* center the title regardless of logo/options */
-h1.tihochat-header,
-.logo h1 {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  text-align: center;
-  white-space: nowrap;      /* optional: avoid wrap if you want a single centered line */
-  font-size: var(--font-size-3xl); /* restore big size */
-  z-index: 2;               /* keep it above header background */
-  /* pointer-events: none;  optional: use if you don't want clicks on centered text */
-}
-
 /* Main Layout */
 .main {
   display: flex;
-  height: 100%;
+  height: 92vh;
   overflow: hidden;
 }
 
@@ -219,7 +194,7 @@ h1.tihochat-header,
   height: 100%;
   background-color: var(--primary-dark);
   display: flex;
-  /*align-items: center;*/
+  align-items: center;
   justify-content: center;
 }
 
@@ -266,9 +241,10 @@ h1.tihochat-header,
 
 /* Video Elements */
 video {
-  width: auto;
-  height: 300px;
-  max-width: 400px;
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  max-height: 300px;
   border-radius: var(--radius-lg);
   object-fit: cover;
   transform: rotateY(180deg);
@@ -432,12 +408,6 @@ video:hover {
   box-shadow: var(--shadow-sm);
 }
 
-span.message__owner {
-  background-color: var(--main-darklg);
-  color: var(--main-light);
-  padding: var(--spacing-md) 0 var(--spacing-md) 0;
-}
-
 /* ========================================
    Form Elements
    ======================================== */
@@ -518,34 +488,13 @@ span.message__owner {
   flex: 1;
 }
 
-/* Default: hide the toggle button (desktop view) */
-#showChat {
-  display: none;
-  cursor: pointer;
-}
-
-/* ========================================
-   Footer settings
-   ======================================== */
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #1d2635;
-  color: white;
-  text-align: center;
-  padding: 1rem;
-}
-
 /* ========================================
    Images & Media
    ======================================== */
 img#logo {
-  margin-top: var(--spacing-md);
   max-width: 100%;
   height: auto;
-  max-height: 400px;
+  max-height: 200px;
   background-color: var(--primary-dark);
 }
 
@@ -678,22 +627,12 @@ img#chat-avatar {
 
 /* Tablet and Small Desktop */
 @media (max-width: 1024px) {
-  * {
-    margin: 0;
-    padding: 0;
-    overflow-y: auto;
-  }
-
   .main__left {
     flex: 0.6;
   }
   
   .main__right {
     flex: 0.4;
-  }
-
-  .form__container {
-    /*margin-top: auto;*/
   }
   
   .videos__group {
@@ -747,22 +686,22 @@ img#chat-avatar {
     font-size: var(--font-size-base);
   }
   
-  /*h1.tihochat-header {*/
-  /*  display: none;*/
-  /*}*/
+  h1.tihochat-header {
+    display: none;
+  }
   
   .header__options {
     position: fixed;
     right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: var(--spacing-sm);
   }
   
   img#preview {
     width: 150px;
     height: 150px;
-  }
-
-  #showChat {
-    display: flex;
   }
   
   .error-code {
@@ -782,12 +721,8 @@ img#chat-avatar {
     padding: 0 var(--spacing-sm);
   }
   
-  /*.main {*/
-  /*  height: calc(100vh - 60px);*/
-  /*}*/
-
-  .main__common {
-    display: contents;
+  .main {
+    height: calc(100vh - 60px);
   }
   
   .form__container {
@@ -827,10 +762,6 @@ img#chat-avatar {
     width: 120px;
     height: 120px;
   }
-
-  #showChat {
-    display: flex;
-  }
   
   .error-code {
     font-size: 3rem;
@@ -866,10 +797,6 @@ img#chat-avatar {
   img#preview {
     width: 100px;
     height: 100px;
-  }
-
-  #showChat {
-    display: flex;
   }
 }
 

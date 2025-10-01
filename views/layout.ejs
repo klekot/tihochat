@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= title || 'TihoChat' %></title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    
+    <!-- JavaScript -->
+    <script src="/js/bootstrap.js"></script>
+    <script src="https://kit.fontawesome.com/9648148fcd.js" crossorigin="anonymous"></script>
+    
+    <!-- Additional scripts -->
+    <% if (typeof scripts !== 'undefined') { %>
+        <% scripts.forEach(function(script) { %>
+            <script src="<%= script %>" <%= script.includes('defer') ? 'defer' : '' %>></script>
+        <% }); %>
+    <% } %>
+    
+    <!-- Additional CSS -->
+    <% if (typeof stylesheets !== 'undefined') { %>
+        <% stylesheets.forEach(function(stylesheet) { %>
+            <link rel="stylesheet" href="<%= stylesheet %>" />
+        <% }); %>
+    <% } %>
+    
+    <!-- Inline scripts -->
+    <% if (typeof inlineScripts !== 'undefined') { %>
+        <% inlineScripts.forEach(function(script) { %>
+            <script><%= script %></script>
+        <% }); %>
+    <% } %>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('partials/header', { 
+        showBack: typeof showBack !== 'undefined' ? showBack : true,
+        title: typeof pageTitle !== 'undefined' ? pageTitle : 'TihoChat',
+        user: typeof user !== 'undefined' ? user : null,
+        roomId: typeof roomId !== 'undefined' ? roomId : null
+    }) %>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <div class="main__common">
+            <div class="form__container">
+                <%- body %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+</body>
+</html>

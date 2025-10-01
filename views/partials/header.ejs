@@ -1,0 +1,22 @@
+<div class="header">
+    <div class="logo">
+        <% if (showBack) { %>
+            <div class="header__back">
+                <i class="fas fa-angle-left" style="width: 80px !important;"><span>&nbsp;&nbsp;</span>Назад</i>
+            </div>
+        <% } %>
+        <h1 class="tihochat-header"><%= title %></h1>
+    </div>
+    
+    <!-- Header options (for room page) -->
+    <% if (user && roomId) { %>
+        <div class="header__options">
+            <div id="profile" class="options__button__profile">
+                <img id="user-avatar" src="<%= (user.avatar) ? '/' + user.id + '/' + user.avatar : '/default_avatar.jpg' %>" alt="Ваша аватарка" />
+            </div>
+            <div id="logout" class="options__button">
+                <i class="fa fa-sign-out"></i>
+            </div>
+        </div>
+    <% } %>
+</div>
