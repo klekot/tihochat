@@ -1,5 +1,6 @@
-const socket = io('/')
-const videoGrid = document.getElementById('video-grid')
+const socket = io('/');
+const videoGrid = document.getElementById('video-grid');
+const config = require('config');
 const myPeer = new Peer(undefined, {
     // host: 'localhost',
     host: 'tihochat.ru',
@@ -16,17 +17,18 @@ const myPeer = new Peer(undefined, {
             { url: 'stun:stun.voipbuster.com' },
             { url: 'stun:stun.voipstunt.com' },
             { url: 'stun:stun.voxgratia.org' },
-            { url: 'stun:stun.xten.com' }
-            // {
-            //     url: 'turn:192.158.29.39:3478?transport=udp',
-            //     credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            //     username: '28224511:1379330808'
-            // },
-            // {
-            //     url: 'turn:192.158.29.39:3478?transport=tcp',
-            //     credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            //     username: '28224511:1379330808'
-            // }
+            { url: 'stun:stun.xten.com' },
+            { url: 'stun:stun.l.google.com:19302' },
+            {
+                url: 'turn:turn.tihochat.ru:3478?transport=udp',
+                credential: config.get('turn.credential'),
+                username: config.get('turn.username')
+            },
+            {
+                url: 'turns:turn.tihochat.ru:5349?transport=tcp',
+                credential: config.get('turn.credential'),
+                username: config.get('turn.username')
+            }
         ]
     },
 
