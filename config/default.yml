@@ -9,3 +9,7 @@ db:
   user: "root"
   password: ""
   database: "tihochat"
+turn:
+  secret: "long-strong-secret"
+default:
+  password: 'hard-to-guess-password'

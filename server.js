@@ -7,12 +7,14 @@ const authRoutes = require('./src/routes/auth');
 const roomRoutes = require('./src/routes/room');
 const inviteRoutes = require('./src/routes/invite');
 const profileRoutes = require('./src/routes/profile');
+const apiTurnRoutes = require('./src/routes/api/turn');
 
 // Setup routes
 app.use('/', authRoutes);
 app.use('/', roomRoutes);
 app.use('/', inviteRoutes);
 app.use('/', profileRoutes);
+app.use('/', apiTurnRoutes);
 
 // Error handling middleware (must be last)
 app.use(handleError);
