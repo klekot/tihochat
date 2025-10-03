@@ -18,8 +18,8 @@ async function initPeer() {
 
     return new Promise((resolve) => {
         const peer = new Peer({
-            host: 'localhost',
-            // host: 'tihochat.ru',
+            // host: 'localhost',
+            host: 'tihochat.ru',
             port: '30001',
             secure: true,
             path: '/',
