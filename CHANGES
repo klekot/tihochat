@@ -1,3 +1,8 @@
+Version 1.4.1:
+ - settings for stun/turn servers and favicons
+ - add own turn server to peer config
+ - Big refactoring of app structure, some fixes and tests
+
 Version 1.4.0:
  - Fix some css, fix pass-through authorization, add main big logo on srart page
 
