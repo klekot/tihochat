@@ -1,41 +1,47 @@
-const socket = io('/')
-const videoGrid = document.getElementById('video-grid')
-const myPeer = new Peer(undefined, {
-    // host: 'localhost',
-    host: 'tihochat.ru',
-    port: '30001',
-    secure: true,
-    path: '/',
-    config: {
-        'iceServers': [
-            { url: 'stun:stun01.sipphone.com' },
-            { url: 'stun:stun.ekiga.net' },
-            { url: 'stun:stunserver.org' },
-            { url: 'stun:stun.softjoys.com' },
-            { url: 'stun:stun.voiparound.com' },
-            { url: 'stun:stun.voipbuster.com' },
-            { url: 'stun:stun.voipstunt.com' },
-            { url: 'stun:stun.voxgratia.org' },
-            { url: 'stun:stun.xten.com' }
-            // {
-            //     url: 'turn:192.158.29.39:3478?transport=udp',
-            //     credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            //     username: '28224511:1379330808'
-            // },
-            // {
-            //     url: 'turn:192.158.29.39:3478?transport=tcp',
-            //     credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-            //     username: '28224511:1379330808'
-            // }
-        ]
-    },
-
-    debug: 3
-})
+const socket = io('/');
+const videoGrid = document.getElementById('video-grid');
 const myVideo = document.createElement('video')
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
-myVideo.muted = true
+myVideo.muted = true;
+
+let myPeer = null;
+
+async function getIceServers() {
+    const res = await fetch("/api/turn");
+    const data = await res.json();
+    return [{ urls: data.urls, username: data.username, credential: data.credential }];
+}
+
+async function initPeer() {
+    const iceServers = await getIceServers();
+
+    return new Promise((resolve) => {
+        const peer = new Peer({
+            // host: 'localhost',
+            host: 'tihochat.ru',
+            port: '30001',
+            secure: true,
+            path: '/',
+            config: { iceServers },
+            debug: 3
+        });
+
+        peer.on("open", (id) => {
+            myPeer = peer;               // assign globally
+            window.myPeer = peer;        // also expose for debugging
+            socket.emit('join-room', ROOM_ID, id, USER_ID, user);
+            console.log("Peer is ready with ID:", id);
+            resolve(peer);
+        });
+    });
+}
+
+
+// initPeer().then((peer) => {
+//     myPeer = peer;
+//     console.log("Peer initialized");
+// });
 
 backBtn.addEventListener("click", () => {
     document.querySelector(".main__left").style.display = "flex";
@@ -57,11 +63,14 @@ let myVideoStream;
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
-}).then(stream => {
+}).then(async stream => {
     myVideoStream = stream;
-    addVideoStream(myVideo, stream, USER_ID)
+    addVideoStream(myVideo, stream, USER_ID);
 
-    myPeer.on('call', call => {
+    // Wait until Peer is initialized before using it
+    const peer = await initPeer();
+
+    peer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
 
@@ -77,11 +86,6 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-disconnected', userId => {
         if (peers[userId]) peers[userId].close()
     })
-})
-
-myPeer.on('open', id => {
-    socket.emit('join-room', ROOM_ID, id, USER_ID, user);
-    myPeer.send({ type: "userId", value: USER_ID });
 })
 
 function connectToNewUser(userId, stream) {
