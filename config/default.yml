@@ -3,12 +3,16 @@ ssl:
   cert: "localhost.pem"
 session:
   secret: ""
+jwt:
+  token: ""
 db:
   host: "localhost"
   port: 3306
   user: "root"
   password: ""
   database: "tihochat"
+peer:
+  host: "localhost"
 turn:
   secret: "long-strong-secret"
 default:

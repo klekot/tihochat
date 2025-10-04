@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ulid } = require('ulid');
+const config = require('config');
 const { authenticateSession } = require('../middleware/auth');
 
 // Home route
@@ -23,7 +24,8 @@ router.get('/room/:room/:invite', (req, res) => {
     } else {
         res.render('room', { 
             roomId: req.params.room, 
-            currentUser: req.session.user 
+            currentUser: req.session.user,
+            peerHost: config.get('peer.host')
         });
     }
 });
@@ -31,7 +33,8 @@ router.get('/room/:room/:invite', (req, res) => {
 router.get('/room/:room', authenticateSession, (req, res) => {
     res.render('room', { 
         roomId: req.params.room, 
-        currentUser: req.session.user 
+        currentUser: req.session.user,
+        peerHost: config.get('peer.host')
     });
 });
 

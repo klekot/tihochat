@@ -18,7 +18,7 @@ async function initPeer() {
 
     return new Promise((resolve) => {
         const peer = new Peer({
-            host: 'localhost',
+            host: PEER_HOST,
             port: '30001',
             secure: true,
             path: '/',
